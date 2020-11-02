@@ -8,13 +8,15 @@ public class EmployeePayrollData {
 	private String name;
 	private Double salary;
 	private LocalDate start_date;
+	private String gender;
 
-	public EmployeePayrollData(int emp_id, String name, double salary, LocalDate start) {
+	public EmployeePayrollData(int emp_id, String name, double salary, LocalDate start, String gender) {
 		super();
 		this.emp_id = emp_id;
 		this.name = name;
 		this.salary = salary;
 		this.start_date = start;
+		this.gender = gender;
 	}
 
 	public int getEmp_id() {
@@ -49,11 +51,20 @@ public class EmployeePayrollData {
 		this.start_date = start_date;
 	}
 
+	public String getGender() {
+		return gender;
+	}
+
+	public void setGender(String gender) {
+		this.gender = gender;
+	}
+
 	@Override
 	public String toString() {
 		return "EmployeePayrollData [emp_id=" + emp_id + ", name=" + name + ", salary=" + salary + ", start_date="
-				+ start_date + "]";
+				+ start_date + ", name=" + name + "]";
 	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)

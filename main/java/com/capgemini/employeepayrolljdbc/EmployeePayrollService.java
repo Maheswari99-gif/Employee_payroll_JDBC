@@ -12,6 +12,12 @@ public class EmployeePayrollService {
 	public enum statementType {
 		STATEMENT, PREPARED_STATEMENT
 	}
+	/**
+	 * 
+	 * @return
+	 * @throws DBServiceException
+	 * usecase2
+	 */
 
 	public List<EmployeePayrollData> viewEmployeePayroll() throws DBServiceException {
 		List<EmployeePayrollData> employeePayrollList = new ArrayList<>();
@@ -25,14 +31,8 @@ public class EmployeePayrollService {
 				String name = resultSet.getString(2);
 				double salary = resultSet.getDouble(3);
 				LocalDate start = resultSet.getDate(4).toLocalDate();
-				/*
-				 * double basic_pay = resultSet.getDouble(6); double deductions =
-				 * resultSet.getDouble(7); double taxable_pay = resultSet.getDouble(8); double
-				 * tax = resultSet.getDouble(9); double net_pay = resultSet.getDouble(10); int
-				 * comp_id = resultSet.getInt(11); String phn_no = resultSet.getString(12);
-				 * String address = resultSet.getString(13);
-				 */
-				empDataObj = new EmployeePayrollData(emp_id, name, salary, start);
+				String gender=resultSet.getString(5);
+				empDataObj = new EmployeePayrollData(emp_id, name, salary, start,gender);
 				employeePayrollList.add(empDataObj);
 			}
 		} catch (Exception e) {
@@ -40,6 +40,13 @@ public class EmployeePayrollService {
 		}
 		return employeePayrollList;
 	}
+	/**
+	 * 
+	 * @param name
+	 * @param salary
+	 * @return
+	 * usecase3
+	 */
 
 	public int updateSalary(String name, Double salary) {
 		String sqlQuery = String.format("UPDATE employee_payroll SET salary = %.2f WHERE NAME = '%s';", salary, name);
@@ -51,6 +58,15 @@ public class EmployeePayrollService {
 		}
 		return 0;
 	}
+	/**
+	 * 
+	 * @param name
+	 * @param salary
+	 * @param preparedStatement
+	 * @return
+	 * @throws DBServiceException
+	 * usecase4
+	 */
 
 	public int updateSalaryUsingPreparedStatement(String name, double salary, statementType preparedStatement)
 			throws DBServiceException {
@@ -78,6 +94,14 @@ public class EmployeePayrollService {
 				.filter(employeeObj -> ((employeeObj.getName()).equals(name))).findFirst().orElse(null);
 		return employee;
 	}
+	/**
+	 * 
+	 * @param startDate
+	 * @param endDate
+	 * @return
+	 * @throws DBServiceException
+	 * usecase5
+	 */
 	public List<EmployeePayrollData> viewEmployeePayrollByJoinDateRange(LocalDate startDate , LocalDate endDate) throws DBServiceException
 	{
 		List<EmployeePayrollData> employeePayrollListByStartDate = new ArrayList<>();
@@ -93,7 +117,8 @@ public class EmployeePayrollService {
 				String name = resultSet.getString(2);
 				double salary = resultSet.getDouble(3);
 				LocalDate start = resultSet.getDate(4).toLocalDate();
-				empDataObj = new EmployeePayrollData(emp_id, name,salary,start);
+				String gender=resultSet.getString(5);
+				empDataObj = new EmployeePayrollData(emp_id, name,salary,start,gender);
 				employeePayrollListByStartDate.add(empDataObj);
 			}
 		} catch (Exception e) {
@@ -101,5 +126,29 @@ public class EmployeePayrollService {
 		}
 		return employeePayrollListByStartDate;
 	}
+	/**
+	 * 
+	 * @param column
+	 * @param operation
+	 * @return
+	 * @throws DBServiceException
+	 * usecase6
+	 */
+	public Map<String,Double> viewEmployeeDataGroupedByGender(String column , String operation) throws DBServiceException
+	{
+		Map<String,Double> empDataByGender = new HashMap<>();
+		String query = String.format("select gender , %s(%s) from Employee_Payroll group by gender;" , operation , column);
+		try(Connection con = new JDBC().getConnection()) {
+			PreparedStatement preparedStatement = con.prepareStatement(query);
+			ResultSet resultSet = preparedStatement.executeQuery();
+			while(resultSet.next())
+			{
+				empDataByGender.put(resultSet.getString(1), resultSet.getDouble(2));
+			}
+		}catch (Exception e) {
+			throw new DBServiceException("SQL Exception", DBServiceExceptionType.SQL_EXCEPTION);
+		}
+		return empDataByGender;
+	}	
 }
 
