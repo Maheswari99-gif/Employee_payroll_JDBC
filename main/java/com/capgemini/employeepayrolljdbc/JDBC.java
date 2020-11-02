@@ -11,11 +11,12 @@ import java.util.Enumeration;
 import com.mysql.cj.jdbc.Driver;
 
 public class JDBC {
-	public static void main(String[] args) throws SQLException {
-		String url = "jdbc:mysql://localhost:3307/employee_payroll?useSSL=false";
-		String userName = "root";
-		String password = "Mahihari@99";
-		Connection con = null;
+	static String url = "jdbc:mysql://localhost:3307/employee_payroll?useSSL=false";
+	static String userName = "root";
+	static String password = "Mahihari@99";
+	private static Connection con = null;
+
+	public static Connection getConnection() {
 		try {
 			// Driver Loading
 			Class.forName("com.mysql.cj.jdbc.Driver");
@@ -23,8 +24,11 @@ public class JDBC {
 			con = DriverManager.getConnection(url, userName, password);
 			System.out.println("Connection Successful");
 
-		}  catch (ClassNotFoundException e) {
+		} catch (ClassNotFoundException e) {
 			throw new IllegalStateException("cannot find the driver");
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		listAllDrivers();
 
@@ -35,13 +39,15 @@ public class JDBC {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		return con;
 
-		/*PreparedStatement stmt = con.prepareStatement("select * from employee_payroll");
-		ResultSet rs = stmt.executeQuery();
-		while (rs.next()) {
-			System.out.println(rs.getInt("id") + " " + rs.getString("name") + " " + rs.getString("gender") + " "
-					+ rs.getDouble("salary") + " " + rs.getDate("startdate"));
-		}*/
+		/*
+		 * PreparedStatement stmt =
+		 * con.prepareStatement("select * from employee_payroll"); ResultSet rs =
+		 * stmt.executeQuery(); while (rs.next()) { System.out.println(rs.getInt("id") +
+		 * " " + rs.getString("name") + " " + rs.getString("gender") + " " +
+		 * rs.getDouble("salary") + " " + rs.getDate("startdate")); }
+		 */
 	}
 
 	private static void listAllDrivers() {
