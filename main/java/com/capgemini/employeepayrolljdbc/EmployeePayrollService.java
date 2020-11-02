@@ -2,13 +2,19 @@ package com.capgemini.employeepayrolljdbc;
 
 import java.sql.*;
 import java.util.*;
-
-import java.sql.Statement;
 import java.time.LocalDate;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 public class EmployeePayrollService {
 	List<EmployeePayrollData> employeePayrollList;
 	EmployeePayrollData empDataObj = null;
+
+	public enum statementType {
+		STATEMENT, PREPARED_STATEMENT
+	}
 
 	public List<EmployeePayrollData> viewEmployeePayroll() throws DBServiceException {
 		List<EmployeePayrollData> employeePayrollList = new ArrayList<>();
@@ -38,13 +44,25 @@ public class EmployeePayrollService {
 		return employeePayrollList;
 	}
 
-	public void updateSalary(String name, double salary) throws DBServiceException {
-		String query = String.format("update Employee_Payroll set salary = %.2f where name = '%s';", salary, name);
+	public int updateData(String name, Double salary) {
+		String sqlQuery = String.format("UPDATE employee_payroll SET salary = %.2f WHERE NAME = '%s';", salary, name);
+		try (Connection connection = JDBC.getConnection()) {
+			Statement statement = connection.createStatement();
+			return statement.executeUpdate(sqlQuery);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return 0;
+	}
+
+	public int updateSalaryUsingPreparedStatement(String name, double salary, statementType preparedStatement)
+			throws DBServiceException {
+		String query = "UPDATE employee_payroll SET salary = ? WHERE name = ?";
 		try (Connection con = new JDBC().getConnection()) {
-			Statement statement = con.createStatement();
-			int result = statement.executeUpdate(query);
-			if (result > 0 && empDataObj != null)
-				empDataObj.setSalary(salary);
+			PreparedStatement statement = con.prepareStatement(query);
+			statement.setDouble(1, salary);
+			statement.setString(2, name);
+			return statement.executeUpdate();
 		} catch (Exception e) {
 			throw new DBServiceException("SQL Exception", DBServiceExceptionType.SQL_EXCEPTION);
 		}
