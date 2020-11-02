@@ -44,7 +44,7 @@ public class EmployeePayrollService {
 		return employeePayrollList;
 	}
 
-	public int updateData(String name, Double salary) {
+	public int updateSalary(String name, Double salary) {
 		String sqlQuery = String.format("UPDATE employee_payroll SET salary = %.2f WHERE NAME = '%s';", salary, name);
 		try (Connection connection = JDBC.getConnection()) {
 			Statement statement = connection.createStatement();

@@ -29,6 +29,13 @@ public class EmployeePayrollTest {
 		boolean isSynced = serviceObj.check(employeeList, "Ambani", 3000000.00);
 		assertTrue(isSynced);
 	}
+	@Test
+	public void givenUpdatedSalaryWhenUpdatedUsingPreparedStatementShouldSyncWithDatabase() throws DBServiceException {
+		employeeList = serviceObj.viewEmployeePayroll();
+		serviceObj.updateSalaryUsingPreparedStatement("Diya", 2000000.00, EmployeePayrollService.statementType.PREPARED_STATEMENT);
+		boolean result = serviceObj.check(employeeList, "Diya", 2000000.00);
+		assertTrue(result);
+	}
 
 
 }
