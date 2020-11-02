@@ -14,28 +14,30 @@ public class EmployeePayrollTest {
 	private List<EmployeePayrollData> employeeList = new ArrayList<>();
 
 	@BeforeClass
-	public static void setUp()  {
+	public static void setUp() {
 		serviceObj = new EmployeePayrollService();
 	}
 
 	@Test
-	public void givenEmpPayrollDB_WhenRetrieved_ShouldMatchEmpCount() throws DBServiceException{
+	public void givenEmpPayrollDB_WhenRetrieved_ShouldMatchEmpCount() throws DBServiceException {
 		List<EmployeePayrollData> empPayrollList = serviceObj.viewEmployeePayroll();
 		assertEquals(3, empPayrollList.size());
 	}
+
 	@Test
-	public void givenUpdatedSalary_WhenRetrieved_ShouldBeSyncedWithDB() throws DBServiceException{
+	public void givenUpdatedSalary_WhenRetrieved_ShouldBeSyncedWithDB() throws DBServiceException {
 		serviceObj.updateSalary("Ambani", 3000000.00);
 		boolean isSynced = serviceObj.check(employeeList, "Ambani", 3000000.00);
 		assertTrue(isSynced);
 	}
+
 	@Test
 	public void givenUpdatedSalaryWhenUpdatedUsingPreparedStatementShouldSyncWithDatabase() throws DBServiceException {
 		employeeList = serviceObj.viewEmployeePayroll();
-		serviceObj.updateSalaryUsingPreparedStatement("Diya", 2000000.00, EmployeePayrollService.statementType.PREPARED_STATEMENT);
-		boolean result = serviceObj.check(employeeList, "Diya", 2000000.00);
+		serviceObj.updateSalaryUsingPreparedStatement("Ambani", 2000000.00,
+				EmployeePayrollService.statementType.PREPARED_STATEMENT);
+		boolean result = serviceObj.check(employeeList, "Ambani", 2000000.00);
 		assertTrue(result);
 	}
-
 
 }
