@@ -1,12 +1,9 @@
 package com.capgemini.employeepayrolljdbc;
 
 import java.sql.*;
+import java.sql.Date;
 import java.util.*;
 import java.time.LocalDate;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 
 public class EmployeePayrollService {
 	List<EmployeePayrollData> employeePayrollList;
@@ -81,5 +78,28 @@ public class EmployeePayrollService {
 				.filter(employeeObj -> ((employeeObj.getName()).equals(name))).findFirst().orElse(null);
 		return employee;
 	}
-
+	public List<EmployeePayrollData> viewEmployeePayrollByJoinDateRange(LocalDate startDate , LocalDate endDate) throws DBServiceException
+	{
+		List<EmployeePayrollData> employeePayrollListByStartDate = new ArrayList<>();
+		String query = "select * from Employee_Payroll where start_date between ? and  ?";
+		try(Connection con = new JDBC().getConnection()) {
+			PreparedStatement preparedStatement = con.prepareStatement(query);
+			preparedStatement.setDate(1, Date.valueOf(startDate));
+			preparedStatement.setDate(2, Date.valueOf(endDate));
+			ResultSet resultSet = preparedStatement.executeQuery();
+			while(resultSet.next())
+			{
+				int emp_id = resultSet.getInt(1);
+				String name = resultSet.getString(2);
+				double salary = resultSet.getDouble(3);
+				LocalDate start = resultSet.getDate(4).toLocalDate();
+				empDataObj = new EmployeePayrollData(emp_id, name,salary,start);
+				employeePayrollListByStartDate.add(empDataObj);
+			}
+		} catch (Exception e) {
+			throw new DBServiceException("SQL Exception", DBServiceExceptionType.SQL_EXCEPTION);
+		}
+		return employeePayrollListByStartDate;
+	}
 }
+
