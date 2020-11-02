@@ -1,7 +1,9 @@
 package com.capgemini.employeepayrolljdbc;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.BeforeClass;
@@ -9,6 +11,8 @@ import org.junit.Test;
 
 public class EmployeePayrollTest {
 	static EmployeePayrollService serviceObj;
+	private List<EmployeePayrollData> employeeList = new ArrayList<>();
+
 	@BeforeClass
 	public static void setUp()  {
 		serviceObj = new EmployeePayrollService();
@@ -19,5 +23,12 @@ public class EmployeePayrollTest {
 		List<EmployeePayrollData> empPayrollList = serviceObj.viewEmployeePayroll();
 		assertEquals(3, empPayrollList.size());
 	}
+	@Test
+	public void givenUpdatedSalary_WhenRetrieved_ShouldBeSyncedWithDB() throws DBServiceException{
+		serviceObj.updateSalary("Ambani", 3000000.00);
+		boolean isSynced = serviceObj.check(employeeList, "Ambani", 3000000.00);
+		assertTrue(isSynced);
+	}
+
 
 }
