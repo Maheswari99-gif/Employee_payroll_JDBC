@@ -6,11 +6,18 @@ import java.util.*;
 import java.time.LocalDate;
 
 public class EmployeePayrollService {
+	private static EmployeePayrollService employeePayrollService;
 	List<EmployeePayrollData> employeePayrollList;
 	EmployeePayrollData empDataObj = null;
 
 	public enum statementType {
 		STATEMENT, PREPARED_STATEMENT
+	}
+
+	public static EmployeePayrollService getInstance() {
+		if (employeePayrollService == null)
+			employeePayrollService = new EmployeePayrollService();
+		return employeePayrollService;
 	}
 
 	/**
@@ -89,7 +96,7 @@ public class EmployeePayrollService {
 
 	}
 
-	private EmployeePayrollData getEmployee(List<EmployeePayrollData> employeeList, String name) {
+	EmployeePayrollData getEmployee(List<EmployeePayrollData> employeeList, String name) {
 		EmployeePayrollData employee = employeeList.stream()
 				.filter(employeeObj -> ((employeeObj.getName()).equals(name))).findFirst().orElse(null);
 		return employee;
@@ -156,6 +163,7 @@ public class EmployeePayrollService {
 	 * @param gender
 	 * @param salary
 	 * @param start_date
+	 * @return
 	 * @throws DBServiceException
 	 */
 
@@ -181,13 +189,13 @@ public class EmployeePayrollService {
 	 * 
 	 * @param name
 	 * @param salary
+	 * @param salary2
 	 * @param startDate
-	 * @param gender
 	 * @return
 	 * @throws DBServiceException
 	 */
-	public EmployeePayrollData addEmployeeToEmployeeAndPayroll(String name, double salary, LocalDate startDate,
-			String gender) throws DBServiceException {
+	public EmployeePayrollData addEmployeeToEmployeeAndPayroll(String name, double salary, String salary2,
+			LocalDate startDate) throws DBServiceException {
 		int emp_id = -1;
 		Connection connection = null;
 		EmployeePayrollData employeePayrollData = null;
@@ -195,7 +203,7 @@ public class EmployeePayrollService {
 		try (Statement statement = connection.createStatement()) {
 			String sql = String.format(
 					"INSERT INTO employee_payroll(name,gender,salary,startDate) VALUES ('%s','%s','%s','%s')", name,
-					gender, salary, Date.valueOf(startDate));
+					startDate, salary, Date.valueOf(salary2));
 			int rowAffected = statement.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
 			if (rowAffected == 1) {
 				ResultSet resultSet = statement.getGeneratedKeys();
