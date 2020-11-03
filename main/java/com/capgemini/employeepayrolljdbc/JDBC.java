@@ -9,6 +9,11 @@ import java.sql.SQLException;
 import java.util.Enumeration;
 
 import com.mysql.cj.jdbc.Driver;
+/**
+ * 
+ * Usecase1
+ *
+ */
 
 public class JDBC {
 	static String url = "jdbc:mysql://localhost:3307/employee_payroll?useSSL=false";

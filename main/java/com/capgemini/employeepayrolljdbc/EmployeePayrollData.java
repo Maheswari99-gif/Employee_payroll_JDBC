@@ -10,6 +10,11 @@ public class EmployeePayrollData {
 	private LocalDate start_date;
 	private String gender;
 
+	public EmployeePayrollData(int emp_id, String name, String gender, double salary, LocalDate start) {
+		this(name, gender, salary, start);
+		this.emp_id = emp_id;
+	}
+
 	public EmployeePayrollData(int emp_id, String name, double salary, LocalDate start, String gender) {
 		super();
 		this.emp_id = emp_id;
@@ -17,6 +22,10 @@ public class EmployeePayrollData {
 		this.salary = salary;
 		this.start_date = start;
 		this.gender = gender;
+	}
+
+	public EmployeePayrollData(String name2, String gender2, double salary2, LocalDate start) {
+		// TODO Auto-generated constructor stub
 	}
 
 	public int getEmp_id() {

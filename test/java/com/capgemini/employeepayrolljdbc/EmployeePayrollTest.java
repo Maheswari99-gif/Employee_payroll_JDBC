@@ -46,35 +46,38 @@ public class EmployeePayrollTest {
 		boolean result = serviceObj.check(employeeList, "Ambani", 2000000.00);
 		assertTrue(result);
 	}
+
 	@Test
-	public void givenDateRange_WhenRetrieved_ShouldMatchEmpCount() throws DBServiceException{
-		List<EmployeePayrollData> empPayrollList = serviceObj.viewEmployeePayrollByJoinDateRange(LocalDate.of(2018,02,01), LocalDate.now() );
+	public void givenDateRange_WhenRetrieved_ShouldMatchEmpCount() throws DBServiceException {
+		List<EmployeePayrollData> empPayrollList = serviceObj
+				.viewEmployeePayrollByJoinDateRange(LocalDate.of(2018, 02, 01), LocalDate.now());
 		assertEquals(3, empPayrollList.size());
 	}
+
 	@Test
 	public void givenEmployeeDB_WhenRetrievedSum_ShouldReturnSumGroupedByGender() throws DBServiceException {
-		empDataByGender = serviceObj.viewEmployeeDataGroupedByGender("salary" , "sum");
+		empDataByGender = serviceObj.viewEmployeeDataGroupedByGender("salary", "sum");
 		assertEquals(1550000, empDataByGender.get("M"), 0.0);
 		assertEquals(300000, empDataByGender.get("F"), 0.0);
 	}
 
 	@Test
 	public void givenEmployeeDB_WhenRetrievedAvg_ShouldReturnAvgByGroupedGender() throws DBServiceException {
-		empDataByGender = serviceObj.viewEmployeeDataGroupedByGender("salary" , "avg");
+		empDataByGender = serviceObj.viewEmployeeDataGroupedByGender("salary", "avg");
 		assertEquals(3100000, empDataByGender.get("M"), 0.0);
 		assertEquals(300000, empDataByGender.get("F"), 0.0);
 	}
 
 	@Test
 	public void givenEmployeeDB_WhenRetrievedMax_ShouldReturnMaxGroupedByGender() throws DBServiceException {
-		empDataByGender = serviceObj.viewEmployeeDataGroupedByGender("salary" , "max");
+		empDataByGender = serviceObj.viewEmployeeDataGroupedByGender("salary", "max");
 		assertEquals(3000000, empDataByGender.get("M"), 0.0);
 		assertEquals(300000, empDataByGender.get("F"), 0.0);
 	}
-	
+
 	@Test
 	public void givenEmployeeDB_WhenRetrievedMin_ShouldReturnMinGroupedByGender() throws DBServiceException {
-		empDataByGender = serviceObj.viewEmployeeDataGroupedByGender("salary" , "min");
+		empDataByGender = serviceObj.viewEmployeeDataGroupedByGender("salary", "min");
 		assertEquals(100000, empDataByGender.get("M"), 0.0);
 		assertEquals(300000, empDataByGender.get("F"), 0.0);
 	}
@@ -84,5 +87,12 @@ public class EmployeePayrollTest {
 		empDataByGender = serviceObj.viewEmployeeDataGroupedByGender("salary", "count");
 		assertEquals(2, empDataByGender.get("M"), 0.0);
 		assertEquals(1, empDataByGender.get("F"), 0.0);
+	}
+
+	@Test
+	public void addNewEmployee_WhenRetrieved_ShouldBeSyncedWithDB() throws DBServiceException {
+		serviceObj.addNewEmployeeToDB("Mahesh", "M", 6000000.0, LocalDate.now());
+		boolean isSynced = serviceObj.check(employeeList, "Mahesh", 6000000.00);
+		assertTrue(isSynced);
 	}
 }
