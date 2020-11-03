@@ -2,38 +2,94 @@ package com.capgemini.employeepayrolljdbc;
 
 import java.sql.Date;
 import java.time.LocalDate;
+import java.util.Arrays;
 
 public class EmployeePayrollData {
-	private int emp_id;
+	private int employeeId;
 	private String name;
+	private int companyId;
+	private String phoneNumber;
+	private String address;
+	private char gender;
 	private Double salary;
-	private LocalDate start_date;
-	private String gender;
+	private LocalDate startDate;
+	private int[] departmentId;
 
-	public EmployeePayrollData(int emp_id, String name, String gender, double salary, LocalDate start) {
-		this(name, gender, salary, start);
-		this.emp_id = emp_id;
+	// Constructor
+	public EmployeePayrollData(int id, String name, char gender, Double salary, LocalDate startDate) {
+		this(name, gender, salary, startDate);
+		this.employeeId = id;
 	}
 
-	public EmployeePayrollData(int emp_id, String name, double salary, LocalDate start, String gender) {
-		super();
-		this.emp_id = emp_id;
+	public EmployeePayrollData(String name, char gender, Double salary, LocalDate startDate) {
+		this.name = name;
+		this.gender = gender;
+		this.salary = salary;
+		this.startDate = startDate;
+	}
+
+	public EmployeePayrollData(int id, String name, Double salary, LocalDate startDate) {
+		this.employeeId = id;
 		this.name = name;
 		this.salary = salary;
-		this.start_date = start;
+		this.startDate = startDate;
+	}
+
+	// Getters and Setters
+	public int getEmployeeId() {
+		return employeeId;
+	}
+
+	public void setEmployeeId(int employeeId) {
+		this.employeeId = employeeId;
+	}
+
+	public int getCompanyId() {
+		return companyId;
+	}
+
+	public void setCompanyId(int companyId) {
+		this.companyId = companyId;
+	}
+
+	public String getPhoneNumber() {
+		return phoneNumber;
+	}
+
+	public void setPhoneNumber(String phoneNumber) {
+		this.phoneNumber = phoneNumber;
+	}
+
+	public String getAddress() {
+		return address;
+	}
+
+	public void setAddress(String address) {
+		this.address = address;
+	}
+
+	public int[] getDepartmentId() {
+		return departmentId;
+	}
+
+	public void setDepartmentId(int[] departmentId) {
+		this.departmentId = departmentId;
+	}
+
+	public int getId() {
+		return employeeId;
+	}
+
+	public char getGender() {
+		return gender;
+	}
+
+	public void setGender(char gender) {
 		this.gender = gender;
 	}
 
-	public EmployeePayrollData(String name2, String gender2, double salary2, LocalDate start) {
-		// TODO Auto-generated constructor stub
-	}
-
-	public int getEmp_id() {
-		return emp_id;
-	}
-
-	public void setEmp_id(int emp_id) {
-		this.emp_id = emp_id;
+	public void setId(int id) {
+		this.employeeId = id;
 	}
 
 	public String getName() {
@@ -52,26 +108,19 @@ public class EmployeePayrollData {
 		this.salary = salary;
 	}
 
-	public LocalDate getStart_date() {
-		return start_date;
+	public LocalDate getStartDate() {
+		return startDate;
 	}
 
-	public void setStart_date(LocalDate start_date) {
-		this.start_date = start_date;
-	}
-
-	public String getGender() {
-		return gender;
-	}
-
-	public void setGender(String gender) {
-		this.gender = gender;
+	public void setStartDate(LocalDate startDate) {
+		this.startDate = startDate;
 	}
 
 	@Override
 	public String toString() {
-		return "EmployeePayrollData [emp_id=" + emp_id + ", name=" + name + ", salary=" + salary + ", start_date="
-				+ start_date + ", name=" + name + "]";
+		return "EmployeePayroll [employeeId=" + employeeId + ", name=" + name + ", companyId=" + companyId
+				+ ", phoneNumber=" + phoneNumber + ", address=" + address + ", gender=" + gender + ", salary=" + salary
+				+ ", startDate=" + startDate + ", departmentId=" + Arrays.toString(departmentId) + "]";
 	}
 
 	@Override
@@ -82,8 +131,8 @@ public class EmployeePayrollData {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		EmployeePayrollData other = (EmployeePayrollData) obj;
-		if (emp_id != other.emp_id)
+		EmployeePayroll other = (EmployeePayroll) obj;
+		if (employeeId != other.employeeId)
 			return false;
 		if (name == null) {
 			if (other.name != null)
@@ -95,10 +144,10 @@ public class EmployeePayrollData {
 				return false;
 		} else if (!salary.equals(other.salary))
 			return false;
-		if (start_date == null) {
-			if (other.start_date != null)
+		if (startDate == null) {
+			if (other.startDate != null)
 				return false;
-		} else if (!start_date.equals(other.start_date))
+		} else if (!startDate.equals(other.startDate))
 			return false;
 		return true;
 	}
