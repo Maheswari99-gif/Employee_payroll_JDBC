@@ -36,7 +36,7 @@ public class EmployeePayrollService {
 			while (resultSet.next()) {
 				int emp_id = resultSet.getInt(1);
 				String name = resultSet.getString(2);
-				double salary = resultSet.getDouble(3);
+				String salary = resultSet.getString(3);
 				LocalDate start = resultSet.getDate(4).toLocalDate();
 				String gender = resultSet.getString(5);
 				empDataObj = new EmployeePayrollData(emp_id, name, salary, start, gender);
@@ -88,7 +88,7 @@ public class EmployeePayrollService {
 		}
 	}
 
-	public boolean check(List<EmployeePayrollData> employeeList, String name, double salary) throws DBServiceException {
+	public boolean check(List<EmployeePayrollData> employeeList, String name, String salary) throws DBServiceException {
 		// TODO Auto-generated method stub
 		EmployeePayrollData employeeObj = getEmployee(employeeList, name);
 		employeeObj.setSalary(salary);
@@ -121,7 +121,7 @@ public class EmployeePayrollService {
 			while (resultSet.next()) {
 				int emp_id = resultSet.getInt(1);
 				String name = resultSet.getString(2);
-				double salary = resultSet.getDouble(3);
+				String salary = resultSet.getString(3);
 				LocalDate start = resultSet.getDate(4).toLocalDate();
 				String gender = resultSet.getString(5);
 				empDataObj = new EmployeePayrollData(emp_id, name, salary, start, gender);
@@ -167,17 +167,17 @@ public class EmployeePayrollService {
 	 * @throws DBServiceException
 	 */
 
-	public void addNewEmployeeToDB(String name, String gender, double salary, LocalDate start_date)
+	public void addNewEmployeeToDB(String name, String gender, String salary, LocalDate start_date)
 			throws DBServiceException {
 		String query = "insert into Employee_Payroll ( name , gender, salary , start_date) values (?,?,?,?)";
 		try (Connection con = new JDBC().getConnection()) {
 			PreparedStatement preparedStatement = con.prepareStatement(query);
 			preparedStatement.setString(1, name);
 			preparedStatement.setString(2, gender);
-			preparedStatement.setDouble(3, salary);
+			preparedStatement.setString(3, salary);
 			preparedStatement.setDate(4, Date.valueOf(start_date));
 			preparedStatement.executeUpdate();
-			empDataObj = new EmployeePayrollData(name, gender, salary, start_date);
+			empDataObj = new EmployeePayrollData(name, gender, start_date, salary);
 			viewEmployeePayroll().add(empDataObj);
 		} catch (Exception e) {
 			throw new DBServiceException("SQL Exception", DBServiceExceptionType.SQL_EXCEPTION);
@@ -194,7 +194,7 @@ public class EmployeePayrollService {
 	 * @return
 	 * @throws DBServiceException
 	 */
-	public EmployeePayrollData addEmployeeToEmployeeAndPayroll(String name, double salary, String salary2,
+	public EmployeePayrollData addEmployeeToEmployeeAndPayroll(String name, double salary, String gender,
 			LocalDate startDate) throws DBServiceException {
 		int emp_id = -1;
 		Connection connection = null;
@@ -203,7 +203,7 @@ public class EmployeePayrollService {
 		try (Statement statement = connection.createStatement()) {
 			String sql = String.format(
 					"INSERT INTO employee_payroll(name,gender,salary,startDate) VALUES ('%s','%s','%s','%s')", name,
-					startDate, salary, Date.valueOf(salary2));
+					startDate, salary, Date.valueOf(salary));
 			int rowAffected = statement.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
 			if (rowAffected == 1) {
 				ResultSet resultSet = statement.getGeneratedKeys();

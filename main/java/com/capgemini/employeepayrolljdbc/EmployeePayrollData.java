@@ -10,25 +10,42 @@ public class EmployeePayrollData {
 	private int companyId;
 	private String phoneNumber;
 	private String address;
-	private char gender;
-	private Double salary;
+	private String gender;
+	private String salary;
+	private double basic_pay;
+	private double deductions;
+	private double taxable_pay;
+	private double tax;
+	private double net_pay;
 	private LocalDate startDate;
 	private int[] departmentId;
 
 	// Constructor
-	public EmployeePayrollData(int id, String name, char gender, Double salary, LocalDate startDate) {
-		this(name, gender, salary, startDate);
+	public EmployeePayrollData(int id, String name, String salary, LocalDate start, String gender) {
+		this(name, salary, start, gender);
 		this.employeeId = id;
 	}
 
-	public EmployeePayrollData(String name, char gender, Double salary, LocalDate startDate) {
+	public EmployeePayrollData(String name, String salary, LocalDate startDate, String gender) {
 		this.name = name;
 		this.gender = gender;
 		this.salary = salary;
 		this.startDate = startDate;
 	}
 
-	public EmployeePayrollData(int id, String name, Double salary, LocalDate startDate) {
+	public EmployeePayrollData(int id, String name, String gender, String salary, LocalDate startDate, double basic_pay,
+			double deductions, double taxable_pay, double tax, double net_pay) {
+		this(id, name, gender, startDate, salary);
+		this.employeeId = id;
+		this.basic_pay = basic_pay;
+		this.deductions = deductions;
+		this.taxable_pay = taxable_pay;
+		this.tax = tax;
+		this.net_pay = net_pay;
+
+	}
+
+	public EmployeePayrollData(int id, String name, String salary, LocalDate startDate) {
 		this.employeeId = id;
 		this.name = name;
 		this.salary = salary;
@@ -80,11 +97,11 @@ public class EmployeePayrollData {
 		return employeeId;
 	}
 
-	public char getGender() {
+	public String getGender() {
 		return gender;
 	}
 
-	public void setGender(char gender) {
+	public void setGender(String gender) {
 		this.gender = gender;
 	}
 
@@ -100,11 +117,11 @@ public class EmployeePayrollData {
 		this.name = name;
 	}
 
-	public Double getSalary() {
+	public String getSalary() {
 		return salary;
 	}
 
-	public void setSalary(Double salary) {
+	public void setSalary(String salary) {
 		this.salary = salary;
 	}
 
