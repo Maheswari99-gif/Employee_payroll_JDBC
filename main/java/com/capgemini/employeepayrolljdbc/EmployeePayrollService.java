@@ -239,4 +239,13 @@ public class EmployeePayrollService {
 		}
 		return employeePayrollData;
 	}
+	public void removeEmployeeFromDB(int empId) throws DBServiceException{
+		String query = String.format("update Employee_Payroll set is_active = false WHERE id= '%s';",empId);
+		try(Connection connection=JDBC.getConnection()){
+			PreparedStatement preparedStatement = connection.prepareStatement(query);
+			preparedStatement.executeUpdate();
+		}catch (SQLException e) {
+			throw new DBServiceException("SQL Exception", DBServiceExceptionType.SQL_EXCEPTION);
+		}
+	}
 }
