@@ -46,13 +46,6 @@ public class JDBC {
 		}
 		return con;
 
-		/*
-		 * PreparedStatement stmt =
-		 * con.prepareStatement("select * from employee_payroll"); ResultSet rs =
-		 * stmt.executeQuery(); while (rs.next()) { System.out.println(rs.getInt("id") +
-		 * " " + rs.getString("name") + " " + rs.getString("gender") + " " +
-		 * rs.getDouble("salary") + " " + rs.getDate("startdate")); }
-		 */
 	}
 
 	private static void listAllDrivers() {

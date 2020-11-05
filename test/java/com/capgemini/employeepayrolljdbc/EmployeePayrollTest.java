@@ -216,6 +216,7 @@ public class EmployeePayrollTest {
 		try {
 			int entries = empPayRollService.readData("DB");
 			String departmentName = "Management";
+			System.out.println("Entries" + entries);
 			EmployeePayRoll[] employeeArray = {
 					new EmployeePayRoll(0, "Deeku", "F", 130000.0, 3, Arrays.asList(departmentName),
 							Arrays.asList(LocalDate.parse("2008-05-01"))),

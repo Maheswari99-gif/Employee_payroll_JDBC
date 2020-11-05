@@ -4,7 +4,7 @@ import java.time.LocalDate;
 import java.util.*;
 
 public class EmployeePayRollService {
-	private static List<EmployeePayRoll> empPayRollList;
+	private static List<EmployeePayRoll> empPayRollList=  new ArrayList<EmployeePayRoll>();
 	private static EmployeePayRollDBService employeePayRollDBService;
 	private static Scanner sc = new Scanner(System.in);
 
@@ -158,11 +158,12 @@ public class EmployeePayRollService {
 
 		HashMap<Integer, Boolean> additionStatus = new HashMap<Integer, Boolean>();
 		employeeList.forEach(e -> {
+			additionStatus.put(e.hashCode(), false);
 			Runnable task = () -> {
-				additionStatus.put(e.hashCode(), false);
 				System.out.println("Employee adding : " + Thread.currentThread().getName());
 				try {
 					this.addEmployeeAndPayRoll(e.name, e.gender, e.salary, e.companyId, e.departmentName, e.startDate);
+					additionStatus.put(e.hashCode(), true);
 				} catch (CustomSQLException e1) {
 					e1.printStackTrace();
 				}
