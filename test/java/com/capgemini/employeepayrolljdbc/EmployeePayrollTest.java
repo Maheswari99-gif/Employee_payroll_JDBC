@@ -1,105 +1,214 @@
 package com.capgemini.employeepayrolljdbc;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import org.junit.*;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.junit.BeforeClass;
-import org.junit.Test;
+import java.util.*;
 
 public class EmployeePayrollTest {
-	static EmployeePayrollService serviceObj;
-	private List<EmployeePayrollData> employeeList = new ArrayList<>();
-	static Map<String, Double> empDataByGender;
-	static List<EmployeePayrollData> empPayrollList;
 
-	@BeforeClass
-	public static void setUp() {
-		serviceObj = new EmployeePayrollService();
-		empDataByGender = new HashMap<>();
-		empPayrollList = new ArrayList<>();
+	@Test
+	public void given3Employees_StoreToFile_ShouldPassTest() {
+		ArrayList<EmployeePayRoll> empPayRoll = new ArrayList<EmployeePayRoll>();
+		empPayRoll.add(new EmployeePayRoll(1, "Bill Gates", 1000000));
+		empPayRoll.add(new EmployeePayRoll(2, "Mark Zuckerburg", 500000));
+		EmployeePayRollService empPayRollService = new EmployeePayRollService(empPayRoll);
+		empPayRollService.writeData("File");
+		empPayRollService.printData("File");
+		int entries = empPayRollService.noOfEntries("File");
+		boolean result = entries == 2 ? true : false;
+		Assert.assertTrue(result);
 	}
 
 	@Test
-	public void givenEmpPayrollDB_WhenRetrieved_ShouldMatchEmpCount() throws DBServiceException {
-		List<EmployeePayrollData> empPayrollList = serviceObj.viewEmployeePayroll();
-		assertEquals(3, empPayrollList.size());
+	public void readingFromFile_NoOfEntries_ShouldMatchActual() {
+		EmployeePayRollService empPayRollService = new EmployeePayRollService();
+		int entries;
+		try {
+			entries = empPayRollService.readData("File");
+			boolean result = entries == 2 ? true : false;
+			Assert.assertTrue(result);
+		} catch (CustomSQLException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Test
-	public void givenUpdatedSalary_WhenRetrieved_ShouldBeSyncedWithDB() throws DBServiceException {
-		serviceObj.updateSalary("Ambani", 3000000.00);
-		boolean isSynced = serviceObj.check(employeeList, "Ambani", 3000000.00);
-		assertTrue(isSynced);
+	public void readingFromDB_NoOfEntries_ShouldMatchActual() {
+		EmployeePayRollService empPayRollService = new EmployeePayRollService();
+		int entries;
+		try {
+			entries = empPayRollService.readData("DB");
+			boolean result = entries == 7 ? true : false;
+			Assert.assertTrue(result);
+		} catch (CustomSQLException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Test
-	public void givenUpdatedSalaryWhenUpdatedUsingPreparedStatementShouldSyncWithDatabase() throws DBServiceException {
-		employeeList = serviceObj.viewEmployeePayroll();
-		serviceObj.updateSalaryUsingPreparedStatement("Ambani", 2000000.00,
-				EmployeePayrollService.statementType.PREPARED_STATEMENT);
-		boolean result = serviceObj.check(employeeList, "Ambani", 2000000.00);
-		assertTrue(result);
+	public void givenNewSalary_UpdatinginDB_ShouldMatch() {
+		EmployeePayRollService empPayRollService = new EmployeePayRollService();
+		try {
+			int entries = empPayRollService.readData("DB");
+			empPayRollService.updateSalary(1, "Bill Gates", 90000.0);
+			boolean result = empPayRollService.checkDBInSyncWithList("Bill Gates");
+			Assert.assertTrue(result);
+		} catch (CustomSQLException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Test
-	public void givenDateRange_WhenRetrieved_ShouldMatchEmpCount() throws DBServiceException {
-		List<EmployeePayrollData> empPayrollList = serviceObj
-				.viewEmployeePayrollByJoinDateRange(LocalDate.of(2018, 02, 01), LocalDate.now());
-		assertEquals(3, empPayrollList.size());
+	public void givenNewSalary_UpdatinginDB_UsingPreparedStatement_ShouldMatch() {
+		EmployeePayRollService empPayRollService = new EmployeePayRollService();
+		try {
+			int entries = empPayRollService.readData("DB");
+			empPayRollService.updateSalary(2, "Bill Gates", 80000.0);
+			boolean result = empPayRollService.checkDBInSyncWithList("Bill Gates");
+			Assert.assertTrue(result);
+		} catch (CustomSQLException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Test
-	public void givenEmployeeDB_WhenRetrievedSum_ShouldReturnSumGroupedByGender() throws DBServiceException {
-		empDataByGender = serviceObj.viewEmployeeDataGroupedByGender("salary", "sum");
-		assertEquals(1550000, empDataByGender.get("M"), 0.0);
-		assertEquals(300000, empDataByGender.get("F"), 0.0);
+	public void giveName_RetreiveDataFromDB_UsingPreparedStatement_ShouldMatch() {
+		EmployeePayRoll employee;
+		LocalDate startDate = LocalDate.parse("2020-04-29");
+		EmployeePayRollService empPayRollService = new EmployeePayRollService();
+		try {
+			int entries = empPayRollService.readData("DB");
+			employee = empPayRollService.preparedStatementReadData("Mark");
+			boolean result = employee.getStartDate().contains(startDate);
+			Assert.assertTrue(result);
+		} catch (CustomSQLException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Test
-	public void givenEmployeeDB_WhenRetrievedAvg_ShouldReturnAvgByGroupedGender() throws DBServiceException {
-		empDataByGender = serviceObj.viewEmployeeDataGroupedByGender("salary", "avg");
-		assertEquals(3100000, empDataByGender.get("M"), 0.0);
-		assertEquals(300000, empDataByGender.get("F"), 0.0);
+	public void giveDateRange_RetreiveDataFromDB_UsingPreparedStatement_ShouldMatch() {
+		List<EmployeePayRoll> empPayRoll = new ArrayList<EmployeePayRoll>();
+		EmployeePayRollService empPayRollService = new EmployeePayRollService();
+		try {
+			empPayRoll = empPayRollService.getDataInDateRange("2010-04-29", "2018-04-29");
+			boolean result = empPayRoll.size() == 3;
+			Assert.assertTrue(result);
+		} catch (CustomSQLException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Test
-	public void givenEmployeeDB_WhenRetrievedMax_ShouldReturnMaxGroupedByGender() throws DBServiceException {
-		empDataByGender = serviceObj.viewEmployeeDataGroupedByGender("salary", "max");
-		assertEquals(3000000, empDataByGender.get("M"), 0.0);
-		assertEquals(300000, empDataByGender.get("F"), 0.0);
+	public void findMinMaxSumAvgcount_GroupedByGender_ShouldMatch() {
+		EmployeePayRollService empPayRollService = new EmployeePayRollService();
+		try {
+			HashMap<String, Double> output = empPayRollService.getMinMaxSumAvgCount();
+			boolean result = output.get("minMale").equals(60000.0) && output.get("maxMale").equals(200000.0)
+					&& output.get("sumMale").equals(660000.0) && output.get("avgMale").equals(110000.0)
+					&& output.get("minFemale").equals(90000.0) && output.get("sumFemale").equals(90000.0)
+					&& output.get("countMale").equals(6.0) && output.get("countFemale").equals(1.0);
+			Assert.assertTrue(result);
+		} catch (CustomSQLException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Test
-	public void givenEmployeeDB_WhenRetrievedMin_ShouldReturnMinGroupedByGender() throws DBServiceException {
-		empDataByGender = serviceObj.viewEmployeeDataGroupedByGender("salary", "min");
-		assertEquals(100000, empDataByGender.get("M"), 0.0);
-		assertEquals(300000, empDataByGender.get("F"), 0.0);
+	public void givenNewEmployee_WhenAdded_ShouldSyncWithDB() {
+		EmployeePayRollService empPayRollService = new EmployeePayRollService();
+		try {
+			int entries = empPayRollService.readData("DB");
+			LocalDate startDate = LocalDate.parse("2008-09-01");
+			int companyId = 3;
+			String departmentName = "Management";
+			empPayRollService.addEmployeeAndPayRoll("Surya", "M", 100000.0, companyId, Arrays.asList(departmentName),
+					Arrays.asList(startDate));
+			boolean result = empPayRollService.checkDBInSyncWithList("Surya");
+			Assert.assertTrue(result);
+		} catch (CustomSQLException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Test
-	public void givenEmployeeDB_WhenRetrievedCount_ShouldReturnCountGroupedByGender() throws DBServiceException {
-		empDataByGender = serviceObj.viewEmployeeDataGroupedByGender("salary", "count");
-		assertEquals(2, empDataByGender.get("M"), 0.0);
-		assertEquals(1, empDataByGender.get("F"), 0.0);
+	public void givenNewEmployee_WhenAddedWithPayrollData_ShouldSyncWithDB() {
+		EmployeePayRollService empPayRollService = new EmployeePayRollService();
+		try {
+			int entries = empPayRollService.readData("DB");
+			LocalDate startDate = LocalDate.parse("2016-11-04");
+			int companyId = 3;
+			String departmentName = "Sales";
+			empPayRollService.addEmployeeAndPayRoll("Srikar", "M", 60000.0, companyId, Arrays.asList(departmentName),
+					Arrays.asList(startDate));
+			boolean result = empPayRollService.checkDBInSyncWithList("Srikar");
+			Assert.assertTrue(result);
+		} catch (CustomSQLException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Test
-	public void addNewEmployee_WhenRetrieved_ShouldBeSyncedWithDB() throws DBServiceException {
-		serviceObj.addNewEmployeeToDB("Mahesh", "M", 6000000.0, LocalDate.now());
-		boolean isSynced = serviceObj.check(employeeList, "Mahesh", 6000000.00);
-		assertTrue(isSynced);
+	public void givenNewEmployee_WhenAddedWithPayrollDataNewERDiagram_ShouldSyncWithDB() {
+		EmployeePayRollService empPayRollService = new EmployeePayRollService();
+		try {
+			int entries = empPayRollService.readData("DB");
+			LocalDate startDate = LocalDate.parse("2019-01-29");
+			int companyId = 4;
+			String departmentName = "Sales";
+			empPayRollService.addEmployeeAndPayRoll("Tina", "F", 200000.0, companyId, Arrays.asList(departmentName),
+					Arrays.asList(startDate));
+			boolean result = empPayRollService.checkDBInSyncWithList("Tina");
+			Assert.assertTrue(result);
+		} catch (CustomSQLException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Test
-	public void givenEmployeeId_WhenDeletedUsing_ShouldSyncWithDB() throws DBServiceException {
-		serviceObj.removeEmployeeFromDB(3);
-		assertEquals(2, empPayrollList.size());
-
+	public void givenEmployeeName_ShouldRemoveFromListAndDB() {
+		EmployeePayRollService empPayRollService = new EmployeePayRollService();
+		List<EmployeePayRoll> empPayRoll = new ArrayList<EmployeePayRoll>();
+		try {
+			int entries = empPayRollService.readData("DB");
+			System.out.println("before " + entries);
+			empPayRollService.deleteEmployee("Tina");
+			int entrie = empPayRollService.readData("DB");
+			System.out.println("after " + entrie);
+			boolean result = empPayRollService.checkIFDeletedFromList("Tina");
+			Assert.assertFalse(result);
+		} catch (CustomSQLException e) {
+			e.printStackTrace();
+		}
 	}
+
+	@Test
+	public void givenMultipleEmployee_WhenAddedToDB_ShouldMatchCountOfEntries() {
+		EmployeePayRollService empPayRollService = new EmployeePayRollService();
+		try {
+			int entries = empPayRollService.readData("DB");
+			String departmentName = "Management";
+			EmployeePayRoll[] employeeArray = {
+					new EmployeePayRoll(0, "Mahi", "F", 130000.0, 3, Arrays.asList(departmentName),
+							Arrays.asList(LocalDate.parse("2018-05-21"))),
+					new EmployeePayRoll(0, "Hari", "F", 100000.0, 3, Arrays.asList(departmentName),
+							Arrays.asList(LocalDate.parse("2016-07-29"))),
+					new EmployeePayRoll(0, "Sri", "F", 70000.0, 4, Arrays.asList(departmentName),
+							Arrays.asList(LocalDate.parse("2015-08-07"))),
+					new EmployeePayRoll(0, "Suryak", "M", 60000.0, 3, Arrays.asList(departmentName),
+							Arrays.asList(LocalDate.parse("2017S-04-29"))) };
+			Instant start = Instant.now();
+			int countOfEntries = empPayRollService.addEmployeeAndPayRoll(Arrays.asList(employeeArray));
+			Instant end = Instant.now();
+			System.out.println("Duration without Thread : " + Duration.between(start, end));
+			boolean result = countOfEntries == 7 ? true : false;
+			Assert.assertTrue(result);
+		} catch (CustomSQLException e) {
+			e.printStackTrace();
+		}
+	}
+
 }

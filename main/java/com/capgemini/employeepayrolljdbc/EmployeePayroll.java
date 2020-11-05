@@ -1,66 +1,129 @@
 package com.capgemini.employeepayrolljdbc;
 
-import java.sql.PreparedStatement;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
-import com.capgemini.employeepayrolljdbc.EmployeePayrollService.statementType;
+public class EmployeePayRoll {
 
-public class EmployeePayroll {
-
-	private static EmployeePayrollService employeePayrollService;
-	private static EmployeePayrollService employeePayrollDBService;
-	List<EmployeePayrollData> employeePayrollList = new ArrayList<>();
-	PreparedStatement preparedStatement;
-	public int employeeId;
+	public int id;
 	public String name;
-	public String salary;
-	public LocalDate startDate;
+	public double salary;
+	public int companyId;
+	public String gender;
+	public List<String> departmentName;
+	public List<LocalDate> startDate;
 
-	public EmployeePayroll() {
-		employeePayrollDBService = employeePayrollDBService.getInstance();
+	public EmployeePayRoll(int id, String name, double salary) {
+		this.id = id;
+		this.name = name;
+		this.salary = salary;
 	}
 
-	// To read payroll Data from database
-	public List<EmployeePayrollData> readData() throws DBServiceException {
-		employeePayrollList = employeePayrollService.viewEmployeePayroll();
-		return employeePayrollList;
+	public EmployeePayRoll(int id, String name, String gender, double salary, int companyId,
+			List<String> departmentName, List<LocalDate> startDate) {
+		this(id, name, salary);
+		this.gender = gender;
+		this.companyId = companyId;
+		this.departmentName = departmentName;
+		this.startDate = startDate;
 	}
 
-	// To update data in the database
-	public void updateData(String name, double salary, statementType type) throws DBServiceException {
-		employeePayrollList = employeePayrollService.viewEmployeePayroll();
-		int rowAffected = employeePayrollDBService.updateSalary(name, salary);
-		if (rowAffected != 0)
-			(getEmployeeByName(employeePayrollList, name)).setSalary(salary);
+	public int getId() {
+		return id;
 	}
 
-	private EmployeePayrollData getEmployeeByName(List<EmployeePayrollData> employeePayrollList2, String name) {
-		EmployeePayrollData employee = employeePayrollList2.stream()
-				.filter(employeeObj -> ((employeeObj.getName()).equals(name))).findFirst().orElse(null);
-		return employee;
+	public void setId(int id) {
+		this.id = id;
 	}
 
-	public boolean checkEmployeeDataInSyncWithDatabase(String name) throws DBServiceException {
-		boolean result = false;
-		employeePayrollList = employeePayrollDBService.viewEmployeePayroll();
-		EmployeePayrollData employee = employeePayrollDBService.getEmployee(employeePayrollList, name);
-		result = (getEmployeeByName(employeePayrollList, name)).equals(employee);
-		return result;
+	public String getName() {
+		return name;
 	}
 
-	// To get employee data joined after a particular date
-	public List<EmployeePayrollData> viewEmployeePayrollByJoinDateRange(LocalDate startDate, LocalDate endDate)
-			throws DBServiceException {
-		return employeePayrollDBService.viewEmployeePayrollByJoinDateRange(startDate, endDate);
+	public void setName(String name) {
+		this.name = name;
 	}
 
-	// To get sum of salaries of male and female employees
-	public Map<String, Double> viewEmployeeDataGroupedByGender(String operation, String column)
-			throws DBServiceException {
-		return employeePayrollDBService.viewEmployeeDataGroupedByGender(operation, column);
+	public double getSalary() {
+		return salary;
+	}
+
+	public void setSalary(double salary) {
+		this.salary = salary;
+	}
+
+	public String toString() {
+		return "id=" + id + ", name=" + name + ", salary=" + salary;
+	}
+
+	public int getCompanyId() {
+		return companyId;
+	}
+
+	public void setCompanyId(int companyId) {
+		this.companyId = companyId;
+	}
+
+	public List<String> getDepartmentName() {
+		return departmentName;
+	}
+
+	public void setDepartmentName(List<String> departmentName) {
+		this.departmentName = departmentName;
+	}
+
+	public List<LocalDate> getStartDate() {
+		return startDate;
+	}
+
+	public void setStartDate(List<LocalDate> startDate) {
+		this.startDate = startDate;
+	}
+
+	public String getGender() {
+		return gender;
+	}
+
+	public void setGender(String gender) {
+		this.gender = gender;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		EmployeePayRoll other = (EmployeePayRoll) obj;
+		if (companyId != other.companyId)
+			return false;
+		if (departmentName == null) {
+			if (other.departmentName != null)
+				return false;
+		} else if (!departmentName.equals(other.departmentName))
+			return false;
+		if (gender == null) {
+			if (other.gender != null)
+				return false;
+		} else if (!gender.equals(other.gender))
+			return false;
+		if (id != other.id)
+			return false;
+		if (name == null) {
+			if (other.name != null)
+				return false;
+		} else if (!name.equals(other.name))
+			return false;
+		if (Double.doubleToLongBits(salary) != Double.doubleToLongBits(other.salary))
+			return false;
+		if (startDate == null) {
+			if (other.startDate != null)
+				return false;
+		} else if (!startDate.equals(other.startDate))
+			return false;
+		return true;
 	}
 
 }
