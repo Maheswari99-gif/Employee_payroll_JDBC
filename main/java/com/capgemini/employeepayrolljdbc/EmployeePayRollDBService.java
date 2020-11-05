@@ -294,7 +294,7 @@ public class EmployeePayRollDBService {
 		}
 	}
 
-	private Connection getConnection() throws CustomSQLException {
+	private synchronized Connection getConnection() throws CustomSQLException {
 		connectionCounter += 1; 
 		String jdbcURL = "jdbc:mysql://localhost:3306/employee_payroll_service?useSSL=false";
 		String userName = "root";
