@@ -184,5 +184,43 @@ public class EmployeePayRollService {
 		}
 		return empPayRollList.size();
 	}
+	public void updateSalaryInAllTables(String name,Double salary) throws CustomSQLException
+	{
+		int success = employeePayRollDBService.updateSalaryInPayrollTable(name, salary);
+		if (success == 1) {
+			for (EmployeePayRoll e : empPayRollList) {
+				if (e.getName().equals(name)) {
+					e.setSalary(salary);
+				}
+			}
+		}
+		
+	}
+	
+	public void updateMultipleSalary(HashMap<String,Double> salaryMap) throws CustomSQLException {
+		HashMap<Integer, Boolean> additionStatus = new HashMap<Integer, Boolean>();
+		salaryMap.forEach((k,v) -> {
+				additionStatus.put(k.hashCode(), false);
+				Runnable task = () -> {			
+					try {
+						updateSalaryInAllTables(k,v);
+						additionStatus.put(k.hashCode(), true);
+					} catch (CustomSQLException e) {
+						e.printStackTrace();
+					}
+				};			
+				Thread thread = new Thread(task, k);
+				thread.start();
+		});
+		
+		while (additionStatus.containsValue(false)) {
+			try {
+				Thread.sleep(10);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
 
 }
