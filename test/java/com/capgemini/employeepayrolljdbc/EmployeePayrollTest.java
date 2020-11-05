@@ -210,5 +210,35 @@ public class EmployeePayrollTest {
 			e.printStackTrace();
 		}
 	}
+	@Test
+	public void givenMultipleEmployeeWithThreads_WhenAddedToDB_ShouldMatchCountOfEntries() {
+		EmployeePayRollService empPayRollService = new EmployeePayRollService();
+		try {
+			int entries = empPayRollService.readData("DB");
+			String departmentName = "Management";
+			EmployeePayRoll[] employeeArray = {
+					new EmployeePayRoll(0, "Deeku", "F", 130000.0, 3, Arrays.asList(departmentName),
+							Arrays.asList(LocalDate.parse("2008-05-01"))),
+					new EmployeePayRoll(0, "Sushu", "F", 100000.0, 3, Arrays.asList(departmentName),
+							Arrays.asList(LocalDate.parse("2011-07-29"))),
+					new EmployeePayRoll(0, "Sravya", "F", 70000.0, 4, Arrays.asList(departmentName),
+							Arrays.asList(LocalDate.parse("2017-07-07"))),
+					new EmployeePayRoll(0, "Mouni", "F", 60000.0, 3, Arrays.asList(departmentName),
+							Arrays.asList(LocalDate.parse("2020-04-29"))) };
+			Instant start = Instant.now();
+			empPayRollService.addEmployeeAndPayRoll(Arrays.asList(employeeArray));
+			Instant end = Instant.now();
+			System.out.println("Duration without Thread : " + Duration.between(start, end));
+			Instant startThread = Instant.now();
+			int countOfEntries = empPayRollService.addEmployeeAndPayRollWithThread(Arrays.asList(employeeArray));
+			Instant endThread = Instant.now();
+			System.out.println("Duration with Thread : " + Duration.between(startThread, endThread));
+			boolean result = countOfEntries == 11 ? true : false;
+			Assert.assertTrue(result);
+		} catch (CustomSQLException e) {
+			e.printStackTrace();
+		}
+	}
+
 
 }
