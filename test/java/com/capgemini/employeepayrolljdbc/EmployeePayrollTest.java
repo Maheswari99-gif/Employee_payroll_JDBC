@@ -2,6 +2,12 @@ package com.capgemini.employeepayrolljdbc;
 
 import org.junit.*;
 
+import com.google.gson.Gson;
+
+import io.restassured.RestAssured;
+import io.restassured.response.Response;
+import io.restassured.specification.RequestSpecification;
+
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -199,9 +205,9 @@ public class EmployeePayrollTest {
 					new EmployeePayRoll(0, "Sri", "F", 70000.0, 4, Arrays.asList(departmentName),
 							Arrays.asList(LocalDate.parse("2015-08-07"))),
 					new EmployeePayRoll(0, "Suryak", "M", 60000.0, 3, Arrays.asList(departmentName),
-							Arrays.asList(LocalDate.parse("2017S-04-29"))) };
+							Arrays.asList(LocalDate.parse("2017-04-29"))) };
 			Instant start = Instant.now();
-			int countOfEntries = empPayRollService.addEmployeeAndPayRoll(Arrays.asList(employeeArray));
+			int countOfEntries = empPayRollService.addEmployeeAndPayRoll(Arrays.asList(employeeArray), "DB");
 			Instant end = Instant.now();
 			System.out.println("Duration without Thread : " + Duration.between(start, end));
 			boolean result = countOfEntries == 7 ? true : false;
@@ -228,7 +234,7 @@ public class EmployeePayrollTest {
 					new EmployeePayRoll(0, "Mouni", "F", 60000.0, 3, Arrays.asList(departmentName),
 							Arrays.asList(LocalDate.parse("2020-04-29"))) };
 			Instant start = Instant.now();
-			empPayRollService.addEmployeeAndPayRoll(Arrays.asList(employeeArray));
+			empPayRollService.addEmployeeAndPayRoll(Arrays.asList(employeeArray), "DB");
 			Instant end = Instant.now();
 			System.out.println("Duration without Thread : " + Duration.between(start, end));
 			Instant startThread = Instant.now();
@@ -253,11 +259,44 @@ public class EmployeePayrollTest {
 			salaryMap.put("Sri", 50000.0);
 			salaryMap.put("Surya", 160000.0);
 			empPayRollService.updateMultipleSalary(salaryMap);
-			boolean result = empPayRollService.checkDBInSyncWithList("Natasha");
+			boolean result = empPayRollService.checkDBInSyncWithList("Sri");
 			Assert.assertTrue(result);
 		} catch (CustomSQLException e) {
 			e.printStackTrace();
 		}
+	}
+
+	@Before
+	public void setup() {
+		RestAssured.baseURI = "http://localhost";
+		RestAssured.port = 3000;
+	}
+
+	public Response addEmployeeToJsonServer(EmployeePayRoll employeePayroll) {
+		String jsonString = new Gson().toJson(employeePayroll);
+		RequestSpecification request = RestAssured.given();
+		request.header("Content-Type", "application/json");
+		request.body(jsonString);
+		return request.post("/employee_payroll");
+	}
+
+	@Test
+	public void employeeWhenAdded_ShouldMatchCount() {
+		EmployeePayRollService empPayRollService = new EmployeePayRollService();
+		List<EmployeePayRoll> employeeList = new ArrayList<EmployeePayRoll>();
+
+		EmployeePayRoll employee = new EmployeePayRoll(0, "Sravani", "F", 130000.0, 2, Arrays.asList("Management"),
+				Arrays.asList(LocalDate.parse("2017-05-01")));
+		Response response = addEmployeeToJsonServer(employee);
+		int statusCode = response.getStatusCode();
+		int countOfEntries = 0;
+		if (statusCode == 201) {
+			employee = new Gson().fromJson(response.asString(), EmployeePayRoll.class);
+			employeeList.add(employee);
+			countOfEntries = empPayRollService.addEmployeeAndPayRoll(employeeList, "REST_IO");
+		}
+		Assert.assertEquals(201, response.getStatusCode());
+		Assert.assertEquals(1, countOfEntries);
 	}
 
 }

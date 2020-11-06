@@ -4,7 +4,7 @@ import java.time.LocalDate;
 import java.util.*;
 
 public class EmployeePayRollService {
-	private static List<EmployeePayRoll> empPayRollList=  new ArrayList<EmployeePayRoll>();
+	private static List<EmployeePayRoll> empPayRollList = new ArrayList<EmployeePayRoll>();
 	private static EmployeePayRollDBService employeePayRollDBService;
 	private static Scanner sc = new Scanner(System.in);
 
@@ -139,18 +139,22 @@ public class EmployeePayRollService {
 		return result;
 	}
 
-	public int addEmployeeAndPayRoll(List<EmployeePayRoll> employeeList) {
-
-		employeeList.forEach(e -> {
-			System.out.println("Employee adding : " + e.getName());
-			try {
-				this.addEmployeeAndPayRoll(e.name, e.gender, e.salary, e.companyId, e.departmentName, e.startDate);
-			} catch (CustomSQLException e1) {
-				e1.printStackTrace();
+	public int addEmployeeAndPayRoll(List<EmployeePayRoll> employeeList, String destination) {
+		if (destination.equals("DB")) {
+			employeeList.forEach(e -> {
+				System.out.println("Employee adding : " + e.getName());
+				try {
+					this.addEmployeeAndPayRoll(e.name, e.gender, e.salary, e.companyId, e.departmentName, e.startDate);
+				} catch (CustomSQLException e1) {
+					e1.printStackTrace();
+				}
+				System.out.println("Employee added : " + e.getName());
+			});
+		} else {
+			for (EmployeePayRoll e : employeeList) {
+				empPayRollList.add(e);
 			}
-			System.out.println("Employee added : " + e.getName());
-		});
-		System.out.println(empPayRollList.size());
+		}
 		return empPayRollList.size();
 	}
 
@@ -184,8 +188,8 @@ public class EmployeePayRollService {
 		}
 		return empPayRollList.size();
 	}
-	public void updateSalaryInAllTables(String name,Double salary) throws CustomSQLException
-	{
+
+	public void updateSalaryInAllTables(String name, Double salary) throws CustomSQLException {
 		int success = employeePayRollDBService.updateSalaryInPayrollTable(name, salary);
 		if (success == 1) {
 			for (EmployeePayRoll e : empPayRollList) {
@@ -194,25 +198,25 @@ public class EmployeePayRollService {
 				}
 			}
 		}
-		
+
 	}
-	
-	public void updateMultipleSalary(HashMap<String,Double> salaryMap) throws CustomSQLException {
+
+	public void updateMultipleSalary(HashMap<String, Double> salaryMap) throws CustomSQLException {
 		HashMap<Integer, Boolean> additionStatus = new HashMap<Integer, Boolean>();
-		salaryMap.forEach((k,v) -> {
-				additionStatus.put(k.hashCode(), false);
-				Runnable task = () -> {			
-					try {
-						updateSalaryInAllTables(k,v);
-						additionStatus.put(k.hashCode(), true);
-					} catch (CustomSQLException e) {
-						e.printStackTrace();
-					}
-				};			
-				Thread thread = new Thread(task, k);
-				thread.start();
+		salaryMap.forEach((k, v) -> {
+			additionStatus.put(k.hashCode(), false);
+			Runnable task = () -> {
+				try {
+					updateSalaryInAllTables(k, v);
+					additionStatus.put(k.hashCode(), true);
+				} catch (CustomSQLException e) {
+					e.printStackTrace();
+				}
+			};
+			Thread thread = new Thread(task, k);
+			thread.start();
 		});
-		
+
 		while (additionStatus.containsValue(false)) {
 			try {
 				Thread.sleep(10);
@@ -221,6 +225,5 @@ public class EmployeePayRollService {
 			}
 		}
 	}
-
 
 }
