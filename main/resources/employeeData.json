@@ -154,23 +154,6 @@
       ]
     },
     {
-      "id": 10,
-      "name": "Keerthi",
-      "salary": 60000,
-      "companyId": 3,
-      "gender": "F",
-      "departmentName": [
-        "Management"
-      ],
-      "startDate": [
-        {
-          "year": 2020,
-          "month": 4,
-          "day": 29
-        }
-      ]
-    },
-    {
       "id": 11,
       "name": "Sravani",
       "salary": 130000,
