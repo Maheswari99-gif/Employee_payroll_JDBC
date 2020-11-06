@@ -5,6 +5,8 @@ import org.junit.*;
 import com.google.gson.Gson;
 
 import io.restassured.RestAssured;
+import io.restassured.config.ConnectionConfig;
+import io.restassured.config.RestAssuredConfig;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 
@@ -12,6 +14,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 public class EmployeePayrollTest {
 
@@ -279,13 +282,21 @@ public class EmployeePayrollTest {
 		request.body(jsonString);
 		return request.post("/employee_payroll");
 	}
+	public EmployeePayRoll[] getEmployeeList()
+	{
+		Response response = RestAssured.get("/employee_payroll/");
+		System.out.println(response.asString());
+		EmployeePayRoll[] employees = new Gson().fromJson(response.asString(), EmployeePayRoll[].class);	
+		RestAssured.config = RestAssuredConfig.config().connectionConfig(new ConnectionConfig().closeIdleConnectionsAfterEachResponseAfter(1, TimeUnit.SECONDS));
+		return employees;
+	}
 
 	@Test
 	public void employeeWhenAdded_ShouldMatchCount() {
 		EmployeePayRollService empPayRollService = new EmployeePayRollService();
 		List<EmployeePayRoll> employeeList = new ArrayList<EmployeePayRoll>();
 
-		EmployeePayRoll employee = new EmployeePayRoll(0, "Sravani", "F", 130000.0, 2, Arrays.asList("Management"),
+		EmployeePayRoll employee = new EmployeePayRoll(1, "Sravani", "F", 130000.0, 2, Arrays.asList("Management"),
 				Arrays.asList(LocalDate.parse("2017-05-01")));
 		Response response = addEmployeeToJsonServer(employee);
 		int statusCode = response.getStatusCode();
@@ -304,11 +315,11 @@ public class EmployeePayrollTest {
 		List<EmployeePayRoll> employeeList = new ArrayList<EmployeePayRoll>();
 		int countOfEntries=0;
 		EmployeePayRoll[] employees =  {
-				new EmployeePayRoll(0, "Vaishnavi", "F", 100000.0, 3, Arrays.asList("Management"),
+				new EmployeePayRoll(2, "Vaishnavi", "F", 100000.0, 3, Arrays.asList("Management"),
 						Arrays.asList(LocalDate.parse("2011-07-29"))),
-				new EmployeePayRoll(0, "Balla", "F", 70000.0, 4, Arrays.asList("Management"),
+				new EmployeePayRoll(3, "Balla", "F", 70000.0, 4, Arrays.asList("Management"),
 						Arrays.asList(LocalDate.parse("2017-07-07"))),
-				new EmployeePayRoll(0, "Keerthi", "F", 60000.0, 3, Arrays.asList("Management"),
+				new EmployeePayRoll(4, "Keerthi", "F", 60000.0, 3, Arrays.asList("Management"),
 						Arrays.asList(LocalDate.parse("2020-04-29"))) };
 		for(EmployeePayRoll employee : employees)
 		{
@@ -335,6 +346,15 @@ public class EmployeePayrollTest {
 		Response  response = request.put("/employee_payroll/"+employeePayRoll.id);
 		int statusCode = response.getStatusCode();
 		Assert.assertEquals(200, statusCode);
+	}
+
+	@Test
+	public void retreiveEmployees_FromJsonServer_ShouldMatchCount(){
+		EmployeePayRoll[] employees = getEmployeeList();
+		EmployeePayRollService empPayRollService = new EmployeePayRollService(new ArrayList<EmployeePayRoll>(Arrays.asList(employees)));
+		int CountOfEntries = empPayRollService.noOfEntries("REST_IO");
+		System.out.println(CountOfEntries);
+		Assert.assertEquals(4, CountOfEntries);
 	}
 
 
