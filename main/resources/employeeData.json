@@ -54,7 +54,7 @@
     {
       "id": 4,
       "name": "Keerthi",
-      "salary": 60000,
+      "salary": 80000,
       "companyId": 3,
       "gender": "F",
       "departmentName": [
@@ -121,23 +121,6 @@
     },
     {
       "id": 8,
-      "name": "Sravani",
-      "salary": 130000,
-      "companyId": 2,
-      "gender": "F",
-      "departmentName": [
-        "Management"
-      ],
-      "startDate": [
-        {
-          "year": 2017,
-          "month": 5,
-          "day": 1
-        }
-      ]
-    },
-    {
-      "id": 9,
       "name": "Vaishnavi",
       "salary": 100000,
       "companyId": 3,
@@ -154,7 +137,7 @@
       ]
     },
     {
-      "id": 10,
+      "id": 9,
       "name": "Balla",
       "salary": 70000,
       "companyId": 4,
@@ -171,7 +154,7 @@
       ]
     },
     {
-      "id": 11,
+      "id": 10,
       "name": "Keerthi",
       "salary": 60000,
       "companyId": 3,
@@ -188,7 +171,7 @@
       ]
     },
     {
-      "id": 12,
+      "id": 11,
       "name": "Sravani",
       "salary": 130000,
       "companyId": 2,
